@@ -2,101 +2,63 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico NR 01 - DRPS</title>
+    <title>Dashboard NR 01 - DRPS</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estilo básico apenas para organizar a tela */
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { padding: 10px 15px; background-color: #0056b3; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #003d82; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        .chart-container { position: relative; height: 400px; width: 100%; }
     </style>
 </head>
 <body>
 
-    <h2>Formulário de Coleta - NR 01</h2>
-    
-    <form id="formNR01">
-        <div class="form-group">
-            <label for="setor">Setor:</label>
-            <select id="setor" required>
-                <option value="">Selecione o setor...</option>
-                <option value="Financeiro">Financeiro</option>
-                <option value="Produção">Produção</option>
-                <option value="RH">RH</option>
-            </select>
-        </div>
+<div class="container">
+    <h1>Diagnóstico de Riscos Psicossociais - NR 01</h1>
+    <div class="chart-container">
+        <canvas id="meuGrafico"></canvas>
+    </div>
+</div>
 
-        <div class="form-group">
-            <label for="avaliador">Nome do Psicólogo/Avaliador:</label>
-            <input type="text" id="avaliador" required>
-        </div>
+<script>
+    const URL_API = 'SUA_URL_DO_WEB_APP_AQUI';
 
-        <div class="form-group">
-            <label>1. Você já presenciou comentários ofensivos?</label>
-            <select id="pergunta1" required>
-                <option value="1">1 - Baixa frequência</option>
-                <option value="2">2 - Média frequência</option>
-                <option value="3">3 - Alta frequência</option>
-            </select>
-        </div>
+    async function carregarDashboard() {
+        try {
+            const response = await fetch(URL_API);
+            const dados = await response.json();
 
-        <button type="submit" id="btnSubmit">Salvar Diagnóstico</button>
-        <p id="mensagemStatus"></p>
-    </form>
+            // Preparando os dados para o gráfico
+            const labels = dados.map(item => item.topico);
+            const valores = dados.map(item => item.gravidade);
 
-    <script>
-        // COLE AQUI A URL GERADA NO PASSO 1 (Apps Script)
-        const URL_DO_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwdP9x_oN03r7V4VyMqfg6lBuPbyah_09-TIkVuGwyffKtfRBVS0M8ChmAsHRevY2g3/exec';
-
-        document.getElementById('formNR01').addEventListener('submit', function(event) {
-            event.preventDefault(); // Impede a página de recarregar
-            
-            const btnSubmit = document.getElementById('btnSubmit');
-            const mensagem = document.getElementById('mensagemStatus');
-            
-            btnSubmit.innerText = "Enviando...";
-            btnSubmit.disabled = true;
-
-            // 1. Coleta os dados dos campos do formulário
-            const dadosParaEnviar = {
-                setor: document.getElementById('setor').value,
-                avaliador: document.getElementById('avaliador').value,
-                pergunta1: document.getElementById('pergunta1').value,
-                pergunta2: "Exemplo de resposta 2" // Adicionaremos as outras dps
-            };
-
-            // 2. Faz o envio (POST) para o Google Apps Script
-            fetch(URL_DO_APPS_SCRIPT, {
-                method: 'POST',
-                // O mode 'no-cors' é muitas vezes necessário para evitar bloqueios de segurança do navegador com requisições pro Google, 
-                // mas usaremos padrão primeiro. Se der erro de CORS, nós ajustamos.
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8', 
+            const ctx = document.getElementById('meuGrafico').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Média de Gravidade por Tópico',
+                        data: valores,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
                 },
-                body: JSON.stringify(dadosParaEnviar)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Sucesso
-                mensagem.innerText = "Dados enviados com sucesso para a planilha!";
-                mensagem.style.color = "green";
-                document.getElementById('formNR01').reset(); // Limpa o form
-            })
-            .catch(error => {
-                // Erro
-                console.error('Erro:', error);
-                mensagem.innerText = "Houve um erro ao enviar os dados.";
-                mensagem.style.color = "red";
-            })
-            .finally(() => {
-                btnSubmit.innerText = "Salvar Diagnóstico";
-                btnSubmit.disabled = false;
+                options: {
+                    indexAxis: 'y', // Gráfico horizontal para ler melhor os tópicos
+                    responsive: true,
+                    scales: {
+                        x: { beginAtZero: true, max: 3 } // Escala de 1 a 3 conforme seu modelo
+                    }
+                }
             });
-        });
-    </script>
+        } catch (erro) {
+            console.error('Erro ao carregar dados:', erro);
+        }
+    }
 
+    carregarDashboard();
+</script>
 </body>
 </html>
