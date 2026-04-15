@@ -3,115 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma DRPS - NR 01</title>
+    <title>Plataforma DRPS - Gestão NR 01</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .nav-active { border-right: 4px solid #3b82f6; background-color: #1e293b; }
+        .tab-content { display: none; }
+        .tab-active { display: block; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
 
-    <nav class="bg-slate-800 text-white p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-tight">NR-01 <span class="text-blue-400">Digital</span></h1>
+    <aside class="w-64 bg-slate-900 text-white flex flex-col">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="text-xl font-bold text-blue-400">NR-01 Digital</h1>
+        </div>
+        <nav class="flex-1 mt-4">
+            <a href="#" onclick="showTab('tab-dashboard')" class="flex items-center px-6 py-3 hover:bg-slate-800 transition nav-active" id="btn-dashboard">
+                <span>Dashboard (Gráficos)</span>
+            </a>
+            <a href="#" onclick="showTab('tab-analise')" class="flex items-center px-6 py-3 hover:bg-slate-800 transition" id="btn-analise">
+                <span>Análise e Avaliação</span>
+            </a>
+            <a href="#" onclick="showTab('tab-medidas')" class="flex items-center px-6 py-3 hover:bg-slate-800 transition" id="btn-medidas">
+                <span>Plano de Medidas</span>
+            </a>
+        </nav>
+        <div class="p-4 bg-slate-800 text-xs text-slate-400">
+            Responsável: <span id="resp-tecnico">Aguardando...</span>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-y-auto">
+        
+        <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
             <div class="flex gap-4">
-                <select id="filtroSetor" class="bg-slate-700 border-none rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500">
-                    <option value="Geral">Visão Geral (Empresa)</option>
+                <select id="filtroSetor" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                    <option value="Geral">Todos os Setores</option>
                     <option value="Financeiro">Financeiro</option>
                     <option value="Produção">Produção</option>
                     <option value="Logística">Logística</option>
                 </select>
-                <button onclick="carregarDados()" class="bg-blue-600 hover:bg-blue-500 px-4 py-1 rounded text-sm transition">Atualizar</button>
+                <button onclick="carregarDados()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded text-sm font-bold shadow-sm">Sincronizar Planilha</button>
             </div>
-        </div>
-    </nav>
+            <div id="loader" class="hidden text-blue-600 font-bold animate-pulse">Processando...</div>
+        </header>
 
-    <main class="container mx-auto py-8 px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
-                <p class="text-gray-500 text-xs uppercase font-bold">Status do Setor</p>
-                <h3 id="statusSetor" class="text-2xl font-black text-gray-800">Carregando...</h3>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
-                <p class="text-gray-500 text-xs uppercase font-bold">Pontos Críticos</p>
-                <h3 id="pontosCriticos" class="text-2xl font-black text-gray-800">0</h3>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
-                <p class="text-gray-500 text-xs uppercase font-bold">Tópicos Estáveis</p>
-                <h3 id="pontosSeguros" class="text-2xl font-black text-gray-800">0</h3>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500">
-                <p class="text-gray-500 text-xs uppercase font-bold">Ações Pendentes</p>
-                <h3 class="text-2xl font-black text-gray-800">Ver Plano</h3>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <h4 class="text-gray-700 font-bold mb-4">Perfil de Gravidade (13 Tópicos)</h4>
-                <canvas id="chartRadar"></canvas>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <h4 class="text-gray-700 font-bold mb-4">Panorama da Matriz de Risco</h4>
-                <div class="max-w-[300px] mx-auto">
-                    <canvas id="chartDoughnut"></canvas>
+        <section id="tab-dashboard" class="tab-content tab-active p-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <p class="text-gray-400 text-xs font-bold uppercase">Gravidade Geral</p>
+                    <h3 id="card-gravidade" class="text-3xl font-black text-slate-800">--</h3>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <p class="text-gray-400 text-xs font-bold uppercase">Risco Crítico</p>
+                    <h3 id="card-critico" class="text-3xl font-black text-red-600">--</h3>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <p class="text-gray-400 text-xs font-bold uppercase">Setor Avaliado</p>
+                    <h3 id="card-setor" class="text-2xl font-black text-blue-600">Geral</h3>
                 </div>
             </div>
-        </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h4 class="font-bold text-slate-700 mb-6 uppercase text-sm">Matriz de Risco (Distribuição)</h4>
+                    <div class="max-w-[300px] mx-auto">
+                        <canvas id="chartDoughnut"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h4 class="font-bold text-slate-700 mb-6 uppercase text-sm">Perfil por Tópico (Gravidade)</h4>
+                    <canvas id="chartRadar"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-analise" class="tab-content p-8">
+            <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                <div class="bg-slate-50 p-4 border-b">
+                    <h3 class="font-bold text-slate-700 uppercase">Diagnóstico Detalhado por Fator de Risco</h3>
+                </div>
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                        <tr>
+                            <th class="px-6 py-4">Fator de Risco</th>
+                            <th class="px-6 py-4">Gravidade</th>
+                            <th class="px-6 py-4">Probabilidade</th>
+                            <th class="px-6 py-4">Risco Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-analise">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tab-medidas" class="tab-content p-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm border mb-6">
+                <h3 class="font-bold text-slate-700 mb-4 uppercase">Cronograma de Implementação NR-01</h3>
+                <div class="grid grid-cols-12 gap-2 text-center text-[10px] font-bold text-gray-400 mb-2">
+                    <div class="col-span-4 text-left">Ação Sugerida</div>
+                    <div>MAR</div><div>ABR</div><div>MAI</div><div>JUN</div><div>JUL</div><div>AGO</div><div>SET</div><div>OUT</div>
+                </div>
+                <div id="lista-medidas" class="space-y-2">
+                    </div>
+            </div>
+        </section>
     </main>
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycby6Ak6rVEcrj4lTC-Ub0awF3-b1_ChwQPLdiSbFCaud_7pmAlWlRueN35tJO_SusIDzMQ/exec';
-        let radarChart, doughnutChart;
+        let charts = {};
+
+        // Sistema de Troca de Abas
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('tab-active'));
+            document.getElementById(tabId).classList.add('tab-active');
+            
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('nav-active'));
+            document.getElementById('btn-' + tabId.split('-')[1]).classList.add('nav-active');
+        }
 
         async function carregarDados() {
+            document.getElementById('loader').classList.remove('hidden');
             const setor = document.getElementById('filtroSetor').value;
+            
             try {
                 const response = await fetch(`${API_URL}?setor=${setor}`);
                 const data = await response.json();
-                atualizarInterface(data);
-            } catch (e) { console.error("Erro ao buscar dados", e); }
+                
+                atualizarDashboard(data);
+                atualizarTabela(data);
+                atualizarMedidas(data);
+                
+                document.getElementById('card-setor').innerText = data.setor;
+            } catch (e) {
+                console.error("Erro na sincronização", e);
+            } finally {
+                document.getElementById('loader').classList.add('hidden');
+            }
         }
 
-        function atualizarInterface(data) {
-            // Atualiza Cards
-            document.getElementById('statusSetor').innerText = data.setor;
-            document.getElementById('pontosCriticos').innerText = data.resumoRisco.critico + data.resumoRisco.alto;
-            document.getElementById('pontosSeguros').innerText = data.resumoRisco.baixo;
+        function atualizarDashboard(data) {
+            const ctxRadar = document.getElementById('chartRadar');
+            const ctxDoughnut = document.getElementById('chartDoughnut');
 
-            const labels = data.topicos.map(t => t.nome.split('-')[0]); // Pega apenas "Tópico X"
-            const gravidade = data.topicos.map(t => t.gravidade);
+            if(charts.radar) charts.radar.destroy();
+            if(charts.doughnut) charts.doughnut.destroy();
 
-            // Destruir gráficos existentes para recriar com novos dados
-            if(radarChart) radarChart.destroy();
-            if(doughnutChart) doughnutChart.destroy();
-
-            // Radar Chart
-            radarChart = new Chart(document.getElementById('chartRadar'), {
+            charts.radar = new Chart(ctxRadar, {
                 type: 'radar',
                 data: {
-                    labels: labels,
+                    labels: data.topicos.map(t => t.nome.substring(0, 10)),
                     datasets: [{
-                        label: 'Nível de Gravidade',
-                        data: gravidade,
+                        label: 'Gravidade',
+                        data: data.topicos.map(t => t.gravidade),
                         backgroundColor: 'rgba(59, 130, 246, 0.2)',
                         borderColor: '#3b82f6',
-                        pointBackgroundColor: '#1d4ed8'
+                        borderWidth: 2
                     }]
                 },
                 options: { scales: { r: { beginAtZero: true, max: 3 } } }
             });
 
-            // Doughnut Chart
-            doughnutChart = new Chart(document.getElementById('chartDoughnut'), {
+            charts.doughnut = new Chart(ctxDoughnut, {
                 type: 'doughnut',
                 data: {
                     labels: ['Baixo', 'Médio', 'Alto', 'Crítico'],
                     datasets: [{
                         data: [data.resumoRisco.baixo, data.resumoRisco.medio, data.resumoRisco.alto, data.resumoRisco.critico],
-                        backgroundColor: ['#22c55e', '#eab308', '#ef4444', '#7e22ce']
+                        backgroundColor: ['#22c55e', '#eab308', '#f97316', '#ef4444']
                     }]
                 }
             });
+
+            document.getElementById('card-critico').innerText = data.resumoRisco.critico;
+        }
+
+        function atualizarTabela(data) {
+            const html = data.topicos.map(t => `
+                <tr class="border-b hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-medium text-gray-700">${t.nome}</td>
+                    <td class="px-6 py-4">${t.gravidade.toFixed(1)}</td>
+                    <td class="px-6 py-4">${t.probabilidade.toFixed(1)}</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100">${t.nivel}</span></td>
+                </tr>
+            `).join('');
+            document.getElementById('tabela-analise').innerHTML = html;
+        }
+
+        function atualizarMedidas(data) {
+            // Lógica para mostrar apenas medidas necessárias
+            const html = data.topicos.filter(t => t.gravidade > 1.5).map(t => `
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <div class="col-span-4 text-xs font-semibold text-gray-600">${t.nome.replace('Tópico', 'Ação p/') }</div>
+                    ${Array(8).fill('<div class="h-4 bg-blue-100 rounded"></div>').join('')}
+                </div>
+            `).join('');
+            document.getElementById('lista-medidas').innerHTML = html;
         }
 
         carregarDados();
