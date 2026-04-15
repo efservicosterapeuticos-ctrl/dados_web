@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico NR 01 - DRPS</title>
+    <style>
+        /* Estilo básico apenas para organizar a tela */
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #0056b3; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #003d82; }
+    </style>
+</head>
+<body>
+
+    <h2>Formulário de Coleta - NR 01</h2>
+    
+    <form id="formNR01">
+        <div class="form-group">
+            <label for="setor">Setor:</label>
+            <select id="setor" required>
+                <option value="">Selecione o setor...</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Produção">Produção</option>
+                <option value="RH">RH</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="avaliador">Nome do Psicólogo/Avaliador:</label>
+            <input type="text" id="avaliador" required>
+        </div>
+
+        <div class="form-group">
+            <label>1. Você já presenciou comentários ofensivos?</label>
+            <select id="pergunta1" required>
+                <option value="1">1 - Baixa frequência</option>
+                <option value="2">2 - Média frequência</option>
+                <option value="3">3 - Alta frequência</option>
+            </select>
+        </div>
+
+        <button type="submit" id="btnSubmit">Salvar Diagnóstico</button>
+        <p id="mensagemStatus"></p>
+    </form>
+
+    <script>
+        // COLE AQUI A URL GERADA NO PASSO 1 (Apps Script)
+        const URL_DO_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwdP9x_oN03r7V4VyMqfg6lBuPbyah_09-TIkVuGwyffKtfRBVS0M8ChmAsHRevY2g3/exec';
+
+        document.getElementById('formNR01').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede a página de recarregar
+            
+            const btnSubmit = document.getElementById('btnSubmit');
+            const mensagem = document.getElementById('mensagemStatus');
+            
+            btnSubmit.innerText = "Enviando...";
+            btnSubmit.disabled = true;
+
+            // 1. Coleta os dados dos campos do formulário
+            const dadosParaEnviar = {
+                setor: document.getElementById('setor').value,
+                avaliador: document.getElementById('avaliador').value,
+                pergunta1: document.getElementById('pergunta1').value,
+                pergunta2: "Exemplo de resposta 2" // Adicionaremos as outras dps
+            };
+
+            // 2. Faz o envio (POST) para o Google Apps Script
+            fetch(URL_DO_APPS_SCRIPT, {
+                method: 'POST',
+                // O mode 'no-cors' é muitas vezes necessário para evitar bloqueios de segurança do navegador com requisições pro Google, 
+                // mas usaremos padrão primeiro. Se der erro de CORS, nós ajustamos.
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8', 
+                },
+                body: JSON.stringify(dadosParaEnviar)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Sucesso
+                mensagem.innerText = "Dados enviados com sucesso para a planilha!";
+                mensagem.style.color = "green";
+                document.getElementById('formNR01').reset(); // Limpa o form
+            })
+            .catch(error => {
+                // Erro
+                console.error('Erro:', error);
+                mensagem.innerText = "Houve um erro ao enviar os dados.";
+                mensagem.style.color = "red";
+            })
+            .finally(() => {
+                btnSubmit.innerText = "Salvar Diagnóstico";
+                btnSubmit.disabled = false;
+            });
+        });
+    </script>
+
+</body>
+</html>
