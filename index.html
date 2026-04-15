@@ -2,63 +2,119 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard NR 01 - DRPS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma DRPS - NR 01</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: #333; text-align: center; }
-        .chart-container { position: relative; height: 400px; width: 100%; }
-    </style>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-<div class="container">
-    <h1>Diagnóstico de Riscos Psicossociais - NR 01</h1>
-    <div class="chart-container">
-        <canvas id="meuGrafico"></canvas>
-    </div>
-</div>
+    <nav class="bg-slate-800 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tight">NR-01 <span class="text-blue-400">Digital</span></h1>
+            <div class="flex gap-4">
+                <select id="filtroSetor" class="bg-slate-700 border-none rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500">
+                    <option value="Geral">Visão Geral (Empresa)</option>
+                    <option value="Financeiro">Financeiro</option>
+                    <option value="Produção">Produção</option>
+                    <option value="Logística">Logística</option>
+                </select>
+                <button onclick="carregarDados()" class="bg-blue-600 hover:bg-blue-500 px-4 py-1 rounded text-sm transition">Atualizar</button>
+            </div>
+        </div>
+    </nav>
 
-<script>
-    const URL_API = 'SUA_URL_DO_WEB_APP_AQUI';
+    <main class="container mx-auto py-8 px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                <p class="text-gray-500 text-xs uppercase font-bold">Status do Setor</p>
+                <h3 id="statusSetor" class="text-2xl font-black text-gray-800">Carregando...</h3>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
+                <p class="text-gray-500 text-xs uppercase font-bold">Pontos Críticos</p>
+                <h3 id="pontosCriticos" class="text-2xl font-black text-gray-800">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
+                <p class="text-gray-500 text-xs uppercase font-bold">Tópicos Estáveis</p>
+                <h3 id="pontosSeguros" class="text-2xl font-black text-gray-800">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500">
+                <p class="text-gray-500 text-xs uppercase font-bold">Ações Pendentes</p>
+                <h3 class="text-2xl font-black text-gray-800">Ver Plano</h3>
+            </div>
+        </div>
 
-    async function carregarDashboard() {
-        try {
-            const response = await fetch(URL_API);
-            const dados = await response.json();
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h4 class="text-gray-700 font-bold mb-4">Perfil de Gravidade (13 Tópicos)</h4>
+                <canvas id="chartRadar"></canvas>
+            </div>
 
-            // Preparando os dados para o gráfico
-            const labels = dados.map(item => item.topico);
-            const valores = dados.map(item => item.gravidade);
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h4 class="text-gray-700 font-bold mb-4">Panorama da Matriz de Risco</h4>
+                <div class="max-w-[300px] mx-auto">
+                    <canvas id="chartDoughnut"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
 
-            const ctx = document.getElementById('meuGrafico').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
+    <script>
+        const API_URL = 'SUA_URL_DO_APPS_SCRIPT_AQUI';
+        let radarChart, doughnutChart;
+
+        async function carregarDados() {
+            const setor = document.getElementById('filtroSetor').value;
+            try {
+                const response = await fetch(`${API_URL}?setor=${setor}`);
+                const data = await response.json();
+                atualizarInterface(data);
+            } catch (e) { console.error("Erro ao buscar dados", e); }
+        }
+
+        function atualizarInterface(data) {
+            // Atualiza Cards
+            document.getElementById('statusSetor').innerText = data.setor;
+            document.getElementById('pontosCriticos').innerText = data.resumoRisco.critico + data.resumoRisco.alto;
+            document.getElementById('pontosSeguros').innerText = data.resumoRisco.baixo;
+
+            const labels = data.topicos.map(t => t.nome.split('-')[0]); // Pega apenas "Tópico X"
+            const gravidade = data.topicos.map(t => t.gravidade);
+
+            // Destruir gráficos existentes para recriar com novos dados
+            if(radarChart) radarChart.destroy();
+            if(doughnutChart) doughnutChart.destroy();
+
+            // Radar Chart
+            radarChart = new Chart(document.getElementById('chartRadar'), {
+                type: 'radar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Média de Gravidade por Tópico',
-                        data: valores,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
+                        label: 'Nível de Gravidade',
+                        data: gravidade,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3b82f6',
+                        pointBackgroundColor: '#1d4ed8'
                     }]
                 },
-                options: {
-                    indexAxis: 'y', // Gráfico horizontal para ler melhor os tópicos
-                    responsive: true,
-                    scales: {
-                        x: { beginAtZero: true, max: 3 } // Escala de 1 a 3 conforme seu modelo
-                    }
+                options: { scales: { r: { beginAtZero: true, max: 3 } } }
+            });
+
+            // Doughnut Chart
+            doughnutChart = new Chart(document.getElementById('chartDoughnut'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Baixo', 'Médio', 'Alto', 'Crítico'],
+                    datasets: [{
+                        data: [data.resumoRisco.baixo, data.resumoRisco.medio, data.resumoRisco.alto, data.resumoRisco.critico],
+                        backgroundColor: ['#22c55e', '#eab308', '#ef4444', '#7e22ce']
+                    }]
                 }
             });
-        } catch (erro) {
-            console.error('Erro ao carregar dados:', erro);
         }
-    }
 
-    carregarDashboard();
-</script>
+        carregarDados();
+    </script>
 </body>
 </html>
