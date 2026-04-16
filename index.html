@@ -3,208 +3,698 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma DRPS - Gestão NR 01</title>
+    <title>Plataforma DRPS - Gestão NR-01</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .nav-active { border-right: 4px solid #3b82f6; background-color: #1e293b; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .mono { font-family: 'Space Mono', monospace; }
+        .nav-active { 
+            border-left: 4px solid #10b981; 
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+            color: #10b981;
+        }
         .tab-content { display: none; }
         .tab-active { display: block; }
+        .badge-baixo { background: #22c55e; color: white; }
+        .badge-medio { background: #eab308; color: white; }
+        .badge-alto { background: #f97316; color: white; }
+        .badge-critico { background: #ef4444; color: white; }
+        .card-glow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        .card-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
     </style>
 </head>
-<body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
+<body class="bg-gradient-to-br from-slate-50 via-white to-slate-100 flex h-screen overflow-hidden">
 
-    <aside class="w-64 bg-slate-900 text-white flex flex-col">
-        <div class="p-6 border-b border-slate-800">
-            <h1 class="text-xl font-bold text-blue-400">NR-01 Digital</h1>
+    <!-- Sidebar -->
+    <aside class="w-72 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col shadow-2xl">
+        <div class="p-8 border-b border-slate-700">
+            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mono">NR-01 DIGITAL</h1>
+            <p class="text-slate-400 text-xs mt-2">Diagnóstico de Riscos Psicossociais</p>
         </div>
-        <nav class="flex-1 mt-4">
-            <a href="#" onclick="showTab('tab-dashboard')" class="flex items-center px-6 py-3 hover:bg-slate-800 transition nav-active" id="btn-dashboard">
-                <span>Dashboard (Gráficos)</span>
+        
+        <nav class="flex-1 mt-6 space-y-1 px-3">
+            <a href="#" onclick="showTab('dashboard')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition nav-active" id="btn-dashboard">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span class="font-semibold">Dashboard</span>
             </a>
-            <a href="#" onclick="showTab('tab-analise')" class="flex items-center px-6 py-3 hover:bg-slate-800 transition" id="btn-analise">
-                <span>Análise e Avaliação</span>
+            <a href="#" onclick="showTab('analise')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition" id="btn-analise">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <span class="font-semibold">Análise Detalhada</span>
             </a>
-            <a href="#" onclick="showTab('tab-medidas')" class="flex items-center px-6 py-3 hover:bg-slate-800 transition" id="btn-medidas">
-                <span>Plano de Medidas</span>
+            <a href="#" onclick="showTab('medidas')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition" id="btn-medidas">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span class="font-semibold">Plano de Ação</span>
             </a>
         </nav>
-        <div class="p-4 bg-slate-800 text-xs text-slate-400">
-            Responsável: <span id="resp-tecnico">Aguardando...</span>
+        
+        <div class="p-6 bg-slate-950/50 border-t border-slate-800">
+            <div class="text-xs text-slate-400 mb-1">Responsável Técnico</div>
+            <div class="text-sm font-semibold text-emerald-400" id="resp-tecnico">Sistema Integrado</div>
+            <div class="text-xs text-slate-500 mt-2">v2.0 | Abril 2026</div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-y-auto">
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden">
         
-        <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
-            <div class="flex gap-4">
-                <select id="filtroSetor" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
-                    <option value="Geral">Todos os Setores</option>
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 p-5 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+            <div class="flex gap-4 items-center">
+                <select id="filtroSetor" onchange="aplicarFiltros()" class="bg-white border-2 border-slate-300 rounded-lg px-4 py-2.5 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                    <option value="">Todos os Setores (Geral)</option>
                     <option value="Financeiro">Financeiro</option>
                     <option value="Produção">Produção</option>
                     <option value="Logística">Logística</option>
+                    <option value="Administrativo">Administrativo</option>
+                    <option value="Vendas">Vendas</option>
                 </select>
-                <button onclick="carregarDados()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded text-sm font-bold shadow-sm">Sincronizar Planilha</button>
+                <button onclick="carregarDadosSimulados()" class="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg hover:shadow-xl transition-all">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Atualizar Dados
+                    </span>
+                </button>
             </div>
-            <div id="loader" class="hidden text-blue-600 font-bold animate-pulse">Processando...</div>
+            <div id="loader" class="hidden">
+                <div class="flex items-center gap-2 text-emerald-600 font-bold">
+                    <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Processando...</span>
+                </div>
+            </div>
         </header>
 
-        <section id="tab-dashboard" class="tab-content tab-active p-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-lg shadow-sm border">
-                    <p class="text-gray-400 text-xs font-bold uppercase">Gravidade Geral</p>
-                    <h3 id="card-gravidade" class="text-3xl font-black text-slate-800">--</h3>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm border">
-                    <p class="text-gray-400 text-xs font-bold uppercase">Risco Crítico</p>
-                    <h3 id="card-critico" class="text-3xl font-black text-red-600">--</h3>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm border">
-                    <p class="text-gray-400 text-xs font-bold uppercase">Setor Avaliado</p>
-                    <h3 id="card-setor" class="text-2xl font-black text-blue-600">Geral</h3>
-                </div>
-            </div>
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto">
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-sm border">
-                    <h4 class="font-bold text-slate-700 mb-6 uppercase text-sm">Matriz de Risco (Distribuição)</h4>
-                    <div class="max-w-[300px] mx-auto">
-                        <canvas id="chartDoughnut"></canvas>
+            <!-- TAB: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content tab-active p-8">
+                
+                <!-- Cards de Resumo -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-purple-500">
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1">Gravidade Média Geral</p>
+                        <h3 id="card-gravidade-media" class="text-4xl font-black text-slate-800 mono">2.1</h3>
+                        <p class="text-xs text-slate-400 mt-1">De 3.0 possíveis</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-red-500">
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1">Riscos Críticos</p>
+                        <h3 id="card-critico" class="text-4xl font-black text-red-600 mono">3</h3>
+                        <p class="text-xs text-slate-400 mt-1">Requerem ação imediata</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-orange-500">
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1">Riscos Altos</p>
+                        <h3 id="card-alto" class="text-4xl font-black text-orange-600 mono">5</h3>
+                        <p class="text-xs text-slate-400 mt-1">Necessitam atenção</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-emerald-500">
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1">Setor Avaliado</p>
+                        <h3 id="card-setor" class="text-2xl font-black text-emerald-600">Geral</h3>
+                        <p class="text-xs text-slate-400 mt-1">Visão consolidada</p>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm border">
-                    <h4 class="font-bold text-slate-700 mb-6 uppercase text-sm">Perfil por Tópico (Gravidade)</h4>
-                    <canvas id="chartRadar"></canvas>
-                </div>
-            </div>
-        </section>
 
-        <section id="tab-analise" class="tab-content p-8">
-            <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div class="bg-slate-50 p-4 border-b">
-                    <h3 class="font-bold text-slate-700 uppercase">Diagnóstico Detalhado por Fator de Risco</h3>
-                </div>
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
-                        <tr>
-                            <th class="px-6 py-4">Fator de Risco</th>
-                            <th class="px-6 py-4">Gravidade</th>
-                            <th class="px-6 py-4">Probabilidade</th>
-                            <th class="px-6 py-4">Risco Final</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-analise">
-                        </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="tab-medidas" class="tab-content p-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm border mb-6">
-                <h3 class="font-bold text-slate-700 mb-4 uppercase">Cronograma de Implementação NR-01</h3>
-                <div class="grid grid-cols-12 gap-2 text-center text-[10px] font-bold text-gray-400 mb-2">
-                    <div class="col-span-4 text-left">Ação Sugerida</div>
-                    <div>MAR</div><div>ABR</div><div>MAI</div><div>JUN</div><div>JUL</div><div>AGO</div><div>SET</div><div>OUT</div>
-                </div>
-                <div id="lista-medidas" class="space-y-2">
+                <!-- Gráficos -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Gráfico de Pizza - Distribuição de Riscos -->
+                    <div class="bg-white p-8 rounded-xl card-glow">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="font-bold text-slate-700 text-lg">Matriz de Risco</h4>
+                            <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">Distribuição</span>
+                        </div>
+                        <div class="max-w-[320px] mx-auto">
+                            <canvas id="chartDoughnut"></canvas>
+                        </div>
                     </div>
-            </div>
-        </section>
+
+                    <!-- Gráfico de Radar - Gravidade por Tópico -->
+                    <div class="bg-white p-8 rounded-xl card-glow">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="font-bold text-slate-700 text-lg">Perfil de Gravidade</h4>
+                            <span class="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-bold">Por Tópico</span>
+                        </div>
+                        <canvas id="chartRadar"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Barras - Top 5 Maiores Riscos -->
+                <div class="bg-white p-8 rounded-xl card-glow">
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="font-bold text-slate-700 text-lg">Top 5 Maiores Riscos</h4>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">Priorização</span>
+                    </div>
+                    <canvas id="chartBar" height="100"></canvas>
+                </div>
+            </section>
+
+            <!-- TAB: ANÁLISE DETALHADA -->
+            <section id="tab-analise" class="tab-content p-8">
+                <div class="bg-white rounded-xl card-glow overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-700 p-6 border-b">
+                        <h3 class="font-bold text-white text-xl">Diagnóstico Detalhado por Fator de Risco</h3>
+                        <p class="text-slate-300 text-sm mt-1">Análise quantitativa e qualitativa completa</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">Tópico / Fator de Risco</th>
+                                    <th class="px-6 py-4 text-center">Gravidade</th>
+                                    <th class="px-6 py-4 text-center">Probabilidade</th>
+                                    <th class="px-6 py-4 text-center">Risco Final</th>
+                                    <th class="px-6 py-4">Fonte Geradora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-analise">
+                                <!-- Preenchido dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: PLANO DE MEDIDAS -->
+            <section id="tab-medidas" class="tab-content p-8">
+                <div class="bg-white p-8 rounded-xl card-glow mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-2xl">Cronograma de Implementação NR-01</h3>
+                            <p class="text-slate-500 text-sm mt-1">Plano de ação para mitigação dos riscos identificados</p>
+                        </div>
+                        <button class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold hover:bg-emerald-700 transition">
+                            Exportar PDF
+                        </button>
+                    </div>
+                    
+                    <!-- Legenda do Timeline -->
+                    <div class="grid grid-cols-12 gap-2 text-center text-[11px] font-bold text-slate-500 mb-4 pb-2 border-b">
+                        <div class="col-span-3 text-left text-slate-700">Ação Preventiva Sugerida</div>
+                        <div>ABR</div><div>MAI</div><div>JUN</div><div>JUL</div><div>AGO</div><div>SET</div><div>OUT</div><div>NOV</div><div>DEZ</div>
+                    </div>
+                    
+                    <div id="lista-medidas" class="space-y-3">
+                        <!-- Preenchido dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Card de Orientações -->
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-200">
+                    <h4 class="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Orientações para Implementação
+                    </h4>
+                    <ul class="text-sm text-blue-800 space-y-2">
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-600 font-bold">•</span>
+                            <span>Priorize ações para riscos classificados como <strong>Críticos</strong> e <strong>Altos</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-600 font-bold">•</span>
+                            <span>Envolva lideranças e RH na execução das medidas de controle</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-600 font-bold">•</span>
+                            <span>Realize monitoramento contínuo após implementação das ações</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
     </main>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycby6Ak6rVEcrj4lTC-Ub0awF3-b1_ChwQPLdiSbFCaud_7pmAlWlRueN35tJO_SusIDzMQ/exec';
-        let charts = {};
+        // ==================================
+        // DADOS SIMULADOS (Baseados na estrutura da planilha)
+        // ==================================
+        
+        const dadosGerais = {
+            "": {  // Geral (todos os setores)
+                topicos: [
+                    { nome: "Assédio de qualquer natureza", gravidade: 2.3, probabilidade: 2.0, fonteGeradora: "Cultura permissiva a desrespeito; ausência de canal de denúncia" },
+                    { nome: "Falta de suporte/apoio", gravidade: 2.5, probabilidade: 2.5, fonteGeradora: "Liderança ausente; falta de escuta; cobrança sem acompanhamento" },
+                    { nome: "Má gestão de mudanças", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "Comunicação inadequada; mudanças abruptas" },
+                    { nome: "Baixa clareza de papel/função", gravidade: 2.1, probabilidade: 2.0, fonteGeradora: "Falta de definição de responsabilidades; ordens contraditórias" },
+                    { nome: "Baixas recompensas", gravidade: 2.7, probabilidade: 2.5, fonteGeradora: "Ausência de feedback; foco exclusivo em metas" },
+                    { nome: "Falta de autonomia", gravidade: 2.2, probabilidade: 2.0, fonteGeradora: "Microgestão; excesso de burocracia" },
+                    { nome: "Baixa justiça organizacional", gravidade: 2.4, probabilidade: 2.0, fonteGeradora: "Critérios pouco transparentes; favorecimento" },
+                    { nome: "Eventos traumáticos", gravidade: 1.2, probabilidade: 1.0, fonteGeradora: "Falta de protocolos de segurança" },
+                    { nome: "Subcarga de trabalho", gravidade: 1.5, probabilidade: 1.5, fonteGeradora: "Subutilização de competências; ociosidade" },
+                    { nome: "Sobrecarga de trabalho", gravidade: 2.8, probabilidade: 3.0, fonteGeradora: "Metas irrealistas; equipe insuficiente; jornadas prolongadas" },
+                    { nome: "Maus relacionamentos", gravidade: 2.0, probabilidade: 2.0, fonteGeradora: "Comunicação agressiva; rivalidade interna" },
+                    { nome: "Difícil comunicação", gravidade: 1.9, probabilidade: 1.5, fonteGeradora: "Turnos desalinhados; distância física" },
+                    { nome: "Trabalho remoto/isolado", gravidade: 1.6, probabilidade: 1.5, fonteGeradora: "Isolamento social; falta de acompanhamento" }
+                ]
+            },
+            "Financeiro": {
+                topicos: [
+                    { nome: "Assédio de qualquer natureza", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "Cultura permissiva a desrespeito" },
+                    { nome: "Falta de suporte/apoio", gravidade: 2.2, probabilidade: 2.0, fonteGeradora: "Liderança ausente em momentos críticos" },
+                    { nome: "Má gestão de mudanças", gravidade: 2.5, probabilidade: 2.5, fonteGeradora: "Mudanças em sistemas sem treinamento adequado" },
+                    { nome: "Baixa clareza de papel/função", gravidade: 1.9, probabilidade: 1.5, fonteGeradora: "Processos bem documentados" },
+                    { nome: "Baixas recompensas", gravidade: 2.6, probabilidade: 2.5, fonteGeradora: "Reconhecimento desigual entre áreas" },
+                    { nome: "Falta de autonomia", gravidade: 2.8, probabilidade: 2.5, fonteGeradora: "Excesso de controles e aprovações" },
+                    { nome: "Baixa justiça organizacional", gravidade: 2.3, probabilidade: 2.0, fonteGeradora: "Critérios de promoção pouco claros" },
+                    { nome: "Eventos traumáticos", gravidade: 1.0, probabilidade: 1.0, fonteGeradora: "Setor com baixo risco físico" },
+                    { nome: "Subcarga de trabalho", gravidade: 1.2, probabilidade: 1.0, fonteGeradora: "Demanda estável" },
+                    { nome: "Sobrecarga de trabalho", gravidade: 2.9, probabilidade: 3.0, fonteGeradora: "Fechamento de mês; prazos fiscais" },
+                    { nome: "Maus relacionamentos", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "Ambiente competitivo" },
+                    { nome: "Difícil comunicação", gravidade: 1.5, probabilidade: 1.5, fonteGeradora: "Comunicação centralizada" },
+                    { nome: "Trabalho remoto/isolado", gravidade: 1.9, probabilidade: 2.0, fonteGeradora: "Parte da equipe em home office" }
+                ]
+            },
+            "Produção": {
+                topicos: [
+                    { nome: "Assédio de qualquer natureza", gravidade: 2.5, probabilidade: 2.5, fonteGeradora: "Pressão por resultados; cultura de cobrança" },
+                    { nome: "Falta de suporte/apoio", gravidade: 2.7, probabilidade: 2.5, fonteGeradora: "Supervisores sobrecarregados" },
+                    { nome: "Má gestão de mudanças", gravidade: 2.0, probabilidade: 2.0, fonteGeradora: "Mudanças em processos produtivos" },
+                    { nome: "Baixa clareza de papel/função", gravidade: 2.3, probabilidade: 2.0, fonteGeradora: "Rotatividade alta; treinamento insuficiente" },
+                    { nome: "Baixas recompensas", gravidade: 2.8, probabilidade: 2.5, fonteGeradora: "Foco em metas sem reconhecimento individual" },
+                    { nome: "Falta de autonomia", gravidade: 2.0, probabilidade: 2.0, fonteGeradora: "Processos padronizados e rígidos" },
+                    { nome: "Baixa justiça organizacional", gravidade: 2.5, probabilidade: 2.5, fonteGeradora: "Percepção de favorecimento" },
+                    { nome: "Eventos traumáticos", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "Risco de acidentes de trabalho" },
+                    { nome: "Subcarga de trabalho", gravidade: 1.3, probabilidade: 1.0, fonteGeradora: "Produção contínua" },
+                    { nome: "Sobrecarga de trabalho", gravidade: 3.0, probabilidade: 3.0, fonteGeradora: "Horas extras frequentes; metas agressivas" },
+                    { nome: "Maus relacionamentos", gravidade: 2.2, probabilidade: 2.0, fonteGeradora: "Estresse e competição por bônus" },
+                    { nome: "Difícil comunicação", gravidade: 2.1, probabilidade: 2.0, fonteGeradora: "Ruído do ambiente; turnos diferentes" },
+                    { nome: "Trabalho remoto/isolado", gravidade: 1.0, probabilidade: 1.0, fonteGeradora: "Trabalho 100% presencial" }
+                ]
+            },
+            "Logística": {
+                topicos: [
+                    { nome: "Assédio de qualquer natureza", gravidade: 2.0, probabilidade: 2.0, fonteGeradora: "Pressão por prazos de entrega" },
+                    { nome: "Falta de suporte/apoio", gravidade: 2.4, probabilidade: 2.5, fonteGeradora: "Gestão à distância; pouco feedback" },
+                    { nome: "Má gestão de mudanças", gravidade: 1.5, probabilidade: 1.5, fonteGeradora: "Mudanças em rotas e sistemas" },
+                    { nome: "Baixa clareza de papel/função", gravidade: 2.0, probabilidade: 2.0, fonteGeradora: "Processos bem definidos" },
+                    { nome: "Baixas recompensas", gravidade: 2.5, probabilidade: 2.5, fonteGeradora: "Reconhecimento pontual; foco em erros" },
+                    { nome: "Falta de autonomia", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "Rastreamento constante de veículos" },
+                    { nome: "Baixa justiça organizacional", gravidade: 2.2, probabilidade: 2.0, fonteGeradora: "Percepção de tratamento desigual" },
+                    { nome: "Eventos traumáticos", gravidade: 2.0, probabilidade: 2.0, fonteGeradora: "Risco de acidentes de trânsito; roubos" },
+                    { nome: "Subcarga de trabalho", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "Períodos de baixa demanda" },
+                    { nome: "Sobrecarga de trabalho", gravidade: 2.7, probabilidade: 2.5, fonteGeradora: "Prazos apertados; jornadas longas" },
+                    { nome: "Maus relacionamentos", gravidade: 1.9, probabilidade: 1.5, fonteGeradora: "Contato limitado com equipe" },
+                    { nome: "Difícil comunicação", gravidade: 2.5, probabilidade: 2.5, fonteGeradora: "Trabalho externo; comunicação via celular" },
+                    { nome: "Trabalho remoto/isolado", gravidade: 2.3, probabilidade: 2.5, fonteGeradora: "Motoristas trabalham sozinhos" }
+                ]
+            },
+            "Administrativo": {
+                topicos: [
+                    { nome: "Assédio de qualquer natureza", gravidade: 2.1, probabilidade: 2.0, fonteGeradora: "Hierarquia rígida" },
+                    { nome: "Falta de suporte/apoio", gravidade: 2.3, probabilidade: 2.0, fonteGeradora: "Gestores com múltiplas responsabilidades" },
+                    { nome: "Má gestão de mudanças", gravidade: 1.7, probabilidade: 1.5, fonteGeradora: "Comunicação interna estruturada" },
+                    { nome: "Baixa clareza de papel/função", gravidade: 2.2, probabilidade: 2.0, fonteGeradora: "Acúmulo de funções" },
+                    { nome: "Baixas recompensas", gravidade: 2.6, probabilidade: 2.5, fonteGeradora: "Pouco reconhecimento para funções de suporte" },
+                    { nome: "Falta de autonomia", gravidade: 2.4, probabilidade: 2.0, fonteGeradora: "Processos burocráticos" },
+                    { nome: "Baixa justiça organizacional", gravidade: 2.3, probabilidade: 2.0, fonteGeradora: "Diferenças salariais entre setores" },
+                    { nome: "Eventos traumáticos", gravidade: 1.1, probabilidade: 1.0, fonteGeradora: "Ambiente de escritório" },
+                    { nome: "Subcarga de trabalho", gravidade: 1.6, probabilidade: 1.5, fonteGeradora: "Períodos de menor movimento" },
+                    { nome: "Sobrecarga de trabalho", gravidade: 2.5, probabilidade: 2.5, fonteGeradora: "Picos de demanda; multitarefas" },
+                    { nome: "Maus relacionamentos", gravidade: 2.1, probabilidade: 2.0, fonteGeradora: "Conflitos interpessoais pontuais" },
+                    { nome: "Difícil comunicação", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "E-mails e reuniões regulares" },
+                    { nome: "Trabalho remoto/isolado", gravidade: 1.7, probabilidade: 2.0, fonteGeradora: "Modelo híbrido implementado" }
+                ]
+            },
+            "Vendas": {
+                topicos: [
+                    { nome: "Assédio de qualquer natureza", gravidade: 2.4, probabilidade: 2.0, fonteGeradora: "Pressão por metas; competição interna" },
+                    { nome: "Falta de suporte/apoio", gravidade: 2.6, probabilidade: 2.5, fonteGeradora: "Foco em resultados; pouco suporte emocional" },
+                    { nome: "Má gestão de mudanças", gravidade: 1.9, probabilidade: 2.0, fonteGeradora: "Mudanças frequentes em comissionamento" },
+                    { nome: "Baixa clareza de papel/função", gravidade: 1.8, probabilidade: 1.5, fonteGeradora: "Objetivos e metas claros" },
+                    { nome: "Baixas recompensas", gravidade: 2.9, probabilidade: 2.5, fonteGeradora: "Recompensa baseada apenas em vendas" },
+                    { nome: "Falta de autonomia", gravidade: 1.7, probabilidade: 1.5, fonteGeradora: "Liberdade para negociação" },
+                    { nome: "Baixa justiça organizacional", gravidade: 2.4, probabilidade: 2.5, fonteGeradora: "Distribuição desigual de leads" },
+                    { nome: "Eventos traumáticos", gravidade: 1.3, probabilidade: 1.0, fonteGeradora: "Exposição a clientes agressivos" },
+                    { nome: "Subcarga de trabalho", gravidade: 1.4, probabilidade: 1.0, fonteGeradora: "Dependente de sazonalidade" },
+                    { nome: "Sobrecarga de trabalho", gravidade: 2.8, probabilidade: 3.0, fonteGeradora: "Trabalho fora do horário; pressão constante" },
+                    { nome: "Maus relacionamentos", gravidade: 2.3, probabilidade: 2.0, fonteGeradora: "Competição por clientes" },
+                    { nome: "Difícil comunicação", gravidade: 2.0, probabilidade: 2.0, fonteGeradora: "Equipe externa; home office" },
+                    { nome: "Trabalho remoto/isolado", gravidade: 2.1, probabilidade: 2.0, fonteGeradora: "Vendedores trabalham remotamente" }
+                ]
+            }
+        };
 
-        // Sistema de Troca de Abas
+        // ==================================
+        // VARIÁVEIS GLOBAIS
+        // ==================================
+        let charts = {};
+        let dadosAtuais = dadosGerais[""];
+
+        // ==================================
+        // FUNÇÕES DE NAVEGAÇÃO
+        // ==================================
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('tab-active'));
-            document.getElementById(tabId).classList.add('tab-active');
+            document.getElementById('tab-' + tabId).classList.add('tab-active');
             
             document.querySelectorAll('nav a').forEach(a => a.classList.remove('nav-active'));
-            document.getElementById('btn-' + tabId.split('-')[1]).classList.add('nav-active');
+            document.getElementById('btn-' + tabId).classList.add('nav-active');
         }
 
-        async function carregarDados() {
-            document.getElementById('loader').classList.remove('hidden');
-            const setor = document.getElementById('filtroSetor').value;
+        // ==================================
+        // FUNÇÕES DE CLASSIFICAÇÃO
+        // ==================================
+        function classificarGravidade(valor) {
+            if (valor >= 2.5) return 'Alta';
+            if (valor >= 1.5) return 'Média';
+            return 'Baixa';
+        }
+
+        function classificarProbabilidade(valor) {
+            if (valor >= 2.5) return 'Alta';
+            if (valor >= 1.5) return 'Média';
+            return 'Baixa';
+        }
+
+        function calcularRiscoFinal(gravidade, probabilidade) {
+            const produto = gravidade * probabilidade;
             
-            try {
-                const response = await fetch(`${API_URL}?setor=${setor}`);
-                const data = await response.json();
-                
-                atualizarDashboard(data);
-                atualizarTabela(data);
-                atualizarMedidas(data);
-                
-                document.getElementById('card-setor').innerText = data.setor;
-            } catch (e) {
-                console.error("Erro na sincronização", e);
-            } finally {
-                document.getElementById('loader').classList.add('hidden');
-            }
+            // Matriz de Risco conforme NR-01
+            // Baixa x Baixa = Baixo
+            // Baixa x Média = Baixo
+            // Baixa x Alta = Médio
+            // Média x Baixa = Baixo
+            // Média x Média = Médio
+            // Média x Alta = Alto
+            // Alta x Baixa = Médio
+            // Alta x Média = Alto
+            // Alta x Alta = Crítico
+            
+            if (produto >= 6.25) return 'Crítico';  // Alta x Alta
+            if (produto >= 3.75) return 'Alto';     // Alta x Média ou Média x Alta
+            if (produto >= 2.25) return 'Médio';    // Demais combinações médias
+            return 'Baixo';
         }
 
-        function atualizarDashboard(data) {
-            const ctxRadar = document.getElementById('chartRadar');
-            const ctxDoughnut = document.getElementById('chartDoughnut');
+        function getClasseBadge(nivel) {
+            const map = {
+                'Baixo': 'badge-baixo',
+                'Médio': 'badge-medio',
+                'Alto': 'badge-alto',
+                'Crítico': 'badge-critico'
+            };
+            return map[nivel] || 'badge-baixo';
+        }
 
-            if(charts.radar) charts.radar.destroy();
-            if(charts.doughnut) charts.doughnut.destroy();
+        // ==================================
+        // APLICAR FILTROS
+        // ==================================
+        function aplicarFiltros() {
+            const setor = document.getElementById('filtroSetor').value;
+            dadosAtuais = dadosGerais[setor] || dadosGerais[""];
+            
+            atualizarDashboard();
+            atualizarTabela();
+            atualizarMedidas();
+            
+            document.getElementById('card-setor').innerText = setor || 'Geral';
+        }
 
-            charts.radar = new Chart(ctxRadar, {
-                type: 'radar',
-                data: {
-                    labels: data.topicos.map(t => t.nome.substring(0, 10)),
-                    datasets: [{
-                        label: 'Gravidade',
-                        data: data.topicos.map(t => t.gravidade),
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        borderColor: '#3b82f6',
-                        borderWidth: 2
-                    }]
-                },
-                options: { scales: { r: { beginAtZero: true, max: 3 } } }
+        // ==================================
+        // ATUALIZAR DASHBOARD
+        // ==================================
+        function atualizarDashboard() {
+            const topicos = dadosAtuais.topicos;
+            
+            // Calcular estatísticas
+            const gravidades = topicos.map(t => t.gravidade);
+            const gravidadeMedia = (gravidades.reduce((a, b) => a + b, 0) / gravidades.length).toFixed(1);
+            
+            const resumoRisco = { baixo: 0, medio: 0, alto: 0, critico: 0 };
+            
+            topicos.forEach(t => {
+                const nivel = calcularRiscoFinal(t.gravidade, t.probabilidade);
+                if (nivel === 'Baixo') resumoRisco.baixo++;
+                else if (nivel === 'Médio') resumoRisco.medio++;
+                else if (nivel === 'Alto') resumoRisco.alto++;
+                else if (nivel === 'Crítico') resumoRisco.critico++;
             });
+            
+            // Atualizar cards
+            document.getElementById('card-gravidade-media').innerText = gravidadeMedia;
+            document.getElementById('card-critico').innerText = resumoRisco.critico;
+            document.getElementById('card-alto').innerText = resumoRisco.alto;
+            
+            // Atualizar gráficos
+            renderizarGraficoDoughnut(resumoRisco);
+            renderizarGraficoRadar(topicos);
+            renderizarGraficoBarras(topicos);
+        }
 
-            charts.doughnut = new Chart(ctxDoughnut, {
+        function renderizarGraficoDoughnut(resumoRisco) {
+            const ctx = document.getElementById('chartDoughnut');
+            if (charts.doughnut) charts.doughnut.destroy();
+            
+            charts.doughnut = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Baixo', 'Médio', 'Alto', 'Crítico'],
                     datasets: [{
-                        data: [data.resumoRisco.baixo, data.resumoRisco.medio, data.resumoRisco.alto, data.resumoRisco.critico],
-                        backgroundColor: ['#22c55e', '#eab308', '#f97316', '#ef4444']
+                        data: [resumoRisco.baixo, resumoRisco.medio, resumoRisco.alto, resumoRisco.critico],
+                        backgroundColor: ['#22c55e', '#eab308', '#f97316', '#ef4444'],
+                        borderWidth: 0
                     }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                padding: 15,
+                                font: { size: 12, weight: '600' }
+                            }
+                        }
+                    }
                 }
             });
-
-            document.getElementById('card-critico').innerText = data.resumoRisco.critico;
         }
 
-        function atualizarTabela(data) {
-            const html = data.topicos.map(t => `
-                <tr class="border-b hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 font-medium text-gray-700">${t.nome}</td>
-                    <td class="px-6 py-4">${t.gravidade.toFixed(1)}</td>
-                    <td class="px-6 py-4">${t.probabilidade.toFixed(1)}</td>
-                    <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100">${t.nivel}</span></td>
-                </tr>
-            `).join('');
+        function renderizarGraficoRadar(topicos) {
+            const ctx = document.getElementById('chartRadar');
+            if (charts.radar) charts.radar.destroy();
+            
+            charts.radar = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: topicos.map(t => t.nome.substring(0, 20)),
+                    datasets: [{
+                        label: 'Gravidade',
+                        data: topicos.map(t => t.gravidade),
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 3,
+                            ticks: { stepSize: 0.5 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function renderizarGraficoBarras(topicos) {
+            const ctx = document.getElementById('chartBar');
+            if (charts.bar) charts.bar.destroy();
+            
+            // Calcular risco final para cada tópico
+            const topicosComRisco = topicos.map(t => ({
+                ...t,
+                riscoNumerico: t.gravidade * t.probabilidade
+            }));
+            
+            // Ordenar e pegar top 5
+            const top5 = topicosComRisco
+                .sort((a, b) => b.riscoNumerico - a.riscoNumerico)
+                .slice(0, 5);
+            
+            charts.bar = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top5.map(t => t.nome.substring(0, 30)),
+                    datasets: [{
+                        label: 'Nível de Risco',
+                        data: top5.map(t => t.riscoNumerico),
+                        backgroundColor: top5.map(t => {
+                            const nivel = calcularRiscoFinal(t.gravidade, t.probabilidade);
+                            if (nivel === 'Crítico') return '#ef4444';
+                            if (nivel === 'Alto') return '#f97316';
+                            if (nivel === 'Médio') return '#eab308';
+                            return '#22c55e';
+                        }),
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 9
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==================================
+        // ATUALIZAR TABELA DE ANÁLISE
+        // ==================================
+        function atualizarTabela() {
+            const topicos = dadosAtuais.topicos;
+            
+            const html = topicos.map(t => {
+                const classifGravidade = classificarGravidade(t.gravidade);
+                const classifProb = classificarProbabilidade(t.probabilidade);
+                const riscoFinal = calcularRiscoFinal(t.gravidade, t.probabilidade);
+                const classeBadge = getClasseBadge(riscoFinal);
+                
+                return `
+                    <tr class="border-b hover:bg-slate-50 transition">
+                        <td class="px-6 py-4 font-semibold text-slate-700">${t.nome}</td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="inline-block">
+                                <div class="font-bold text-lg">${t.gravidade.toFixed(1)}</div>
+                                <div class="text-xs text-slate-500">${classifGravidade}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="inline-block">
+                                <div class="font-bold text-lg">${t.probabilidade.toFixed(1)}</div>
+                                <div class="text-xs text-slate-500">${classifProb}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-4 py-2 rounded-full text-sm font-bold ${classeBadge}">${riscoFinal}</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${t.fonteGeradora}</td>
+                    </tr>
+                `;
+            }).join('');
+            
             document.getElementById('tabela-analise').innerHTML = html;
         }
 
-        function atualizarMedidas(data) {
-            // Lógica para mostrar apenas medidas necessárias
-            const html = data.topicos.filter(t => t.gravidade > 1.5).map(t => `
-                <div class="grid grid-cols-12 gap-2 items-center">
-                    <div class="col-span-4 text-xs font-semibold text-gray-600">${t.nome.replace('Tópico', 'Ação p/') }</div>
-                    ${Array(8).fill('<div class="h-4 bg-blue-100 rounded"></div>').join('')}
-                </div>
-            `).join('');
-            document.getElementById('lista-medidas').innerHTML = html;
+        // ==================================
+        // ATUALIZAR PLANO DE MEDIDAS
+        // ==================================
+        function atualizarMedidas() {
+            const topicos = dadosAtuais.topicos;
+            
+            // Filtrar apenas riscos que exigem ação (gravidade > 1.5 OU probabilidade > 1.5)
+            const topicosAcao = topicos.filter(t => {
+                const risco = calcularRiscoFinal(t.gravidade, t.probabilidade);
+                return risco === 'Crítico' || risco === 'Alto' || risco === 'Médio';
+            });
+            
+            const html = topicosAcao.map((t, index) => {
+                const risco = calcularRiscoFinal(t.gravidade, t.probabilidade);
+                const nomeAcao = t.nome.replace('Tópico', 'Ação para').replace(/\d+ - /, '');
+                
+                // Definir duração do cronograma baseado no risco
+                let duracao = 4; // padrão 4 meses
+                if (risco === 'Crítico') duracao = 6;
+                if (risco === 'Alto') duracao = 5;
+                
+                // Criar barras de progresso
+                const barras = Array(9).fill(null).map((_, i) => {
+                    if (i < duracao) {
+                        const corBarra = risco === 'Crítico' ? 'bg-red-400' : 
+                                       risco === 'Alto' ? 'bg-orange-400' : 
+                                       'bg-yellow-400';
+                        return `<div class="h-5 ${corBarra} rounded shadow-sm"></div>`;
+                    }
+                    return `<div class="h-5 bg-slate-100 rounded"></div>`;
+                }).join('');
+                
+                return `
+                    <div class="grid grid-cols-12 gap-2 items-center py-2 border-b border-slate-100 hover:bg-slate-50 transition">
+                        <div class="col-span-3 text-sm font-semibold text-slate-700 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full ${risco === 'Crítico' ? 'bg-red-500' : risco === 'Alto' ? 'bg-orange-500' : 'bg-yellow-500'}"></span>
+                            ${nomeAcao}
+                        </div>
+                        ${barras}
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('lista-medidas').innerHTML = html || '<div class="text-center text-slate-500 py-8">Nenhuma ação necessária no momento</div>';
         }
 
-        carregarDados();
+        // ==================================
+        // CARREGAR DADOS SIMULADOS
+        // ==================================
+        function carregarDadosSimulados() {
+            document.getElementById('loader').classList.remove('hidden');
+            
+            setTimeout(() => {
+                aplicarFiltros();
+                document.getElementById('loader').classList.add('hidden');
+                
+                // Feedback visual
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Atualizado!</span>';
+                btn.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('bg-green-600');
+                }, 2000);
+            }, 800);
+        }
+
+        // ==================================
+        // INICIALIZAÇÃO
+        // ==================================
+        window.onload = function() {
+            aplicarFiltros();
+        };
     </script>
 </body>
 </html>
