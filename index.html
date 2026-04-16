@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GESTÃO NE1- ELIS FORMAIO</title>
+    <title>Plataforma DRPS - Gestão NR-01</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,60 +11,70 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        .mono { font-family: 'Space Mono', monospace; }
+        /* Fonte global alterada para Montserrat */
+        body { font-family: 'Montserrat', sans-serif; }
+        
+        /* Tema Marrom/Bege - Classes de navegação */
         .nav-active { 
-            border-left: 4px solid #b2cf2f; 
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
-            color: #10b981;
+            border-left: 4px solid #D4B895; /* Bege Dourado */
+            background: linear-gradient(90deg, rgba(212, 184, 149, 0.15) 0%, transparent 100%);
+            color: #EFE4D7;
         }
+        
         .tab-content { display: none; }
         .tab-active { display: block; }
-        .badge-baixo { background: #22c55e; color: white; }
-        .badge-medio { background: #eab308; color: white; }
-        .badge-alto { background: #f97316; color: white; }
-        .badge-critico { background: #ef4444; color: white; }
-        .card-glow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; }
-        .card-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); }
+        
+        /* Cores de Risco (Mantidas para clareza da matriz) */
+        .badge-baixo { background: #6b9e78; color: white; }
+        .badge-medio { background: #d4a373; color: white; }
+        .badge-alto { background: #e2725b; color: white; }
+        .badge-critico { background: #c14953; color: white; }
+        
+        /* Efeito dos Cards */
+        .card-glow { box-shadow: 0 4px 20px rgba(139, 107, 83, 0.08); transition: all 0.3s ease; }
+        .card-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(139, 107, 83, 0.15); }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-slate-100 flex h-screen overflow-hidden">
+<body class="bg-[#FDFBF7] flex h-screen overflow-hidden">
 
-    <aside class="w-72 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col shadow-2xl">
-        <div class="p-8 border-b border-slate-700">
-            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mono uppercase">NR-01 Digital</h1>
-            <p class="text-slate-400 text-xs mt-2">Gestão de Riscos Psicossociais</p>
+    <aside class="w-72 bg-gradient-to-b from-[#8B6B53] via-[#7A5A44] to-[#5C4033] text-[#FDFBF7] flex flex-col shadow-2xl">
+        
+        <div class="p-8 border-b border-[#9D7E67] flex flex-col items-center text-center">
+            <img src="./logo.png" alt="Logo da Empresa" class="w-32 object-contain mb-4 drop-shadow-md">
+            
+            <h1 class="text-xl font-black tracking-wider uppercase text-[#FDFBF7]">NR-01 Digital</h1>
+            <p class="text-[#D4B895] text-xs mt-1 font-medium">Gestão de Riscos Psicossociais</p>
         </div>
         
-        <nav class="flex-1 mt-6 space-y-1 px-3">
-            <a href="#" onclick="showTab('dashboard')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition nav-active" id="btn-dashboard">
+        <nav class="flex-1 mt-6 space-y-2 px-4">
+            <a href="#" onclick="showTab('dashboard')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#6b4c3a] transition nav-active" id="btn-dashboard">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                <span class="font-semibold">Painel Geral</span>
+                <span class="font-semibold text-sm tracking-wide">Painel Geral</span>
             </a>
-            <a href="#" onclick="showTab('analise')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition" id="btn-analise">
+            <a href="#" onclick="showTab('analise')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#6b4c3a] transition text-[#E8D8C8]" id="btn-analise">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                <span class="font-semibold">Análise de Dados</span>
+                <span class="font-semibold text-sm tracking-wide">Análise de Dados</span>
             </a>
-            <a href="#" onclick="showTab('medidas')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition" id="btn-medidas">
+            <a href="#" onclick="showTab('medidas')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#6b4c3a] transition text-[#E8D8C8]" id="btn-medidas">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span class="font-semibold">Plano de Ação</span>
+                <span class="font-semibold text-sm tracking-wide">Plano de Ação</span>
             </a>
         </nav>
         
-        <div class="p-6 bg-slate-950/50 border-t border-slate-800">
-            <div class="text-xs text-slate-400 mb-1">Responsável Técnico</div>
-            <div class="text-sm font-semibold text-emerald-400" id="resp-tecnico">Aguardando Sincronização</div>
+        <div class="p-6 bg-[#4A3226] border-t border-[#6b4c3a] text-center">
+            <div class="text-[10px] text-[#D4B895] mb-1 tracking-widest uppercase">Responsável Técnico</div>
+            <div class="text-sm font-bold text-[#FDFBF7]" id="resp-tecnico">Aguardando Sincronização</div>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col overflow-hidden">
         
-        <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 p-5 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+        <header class="bg-white/90 backdrop-blur-md border-b border-[#E6DCD3] p-5 flex justify-between items-center sticky top-0 z-10 shadow-sm">
             <div class="flex gap-4 items-center">
-                <select id="filtroSetor" onchange="carregarDadosReais()" class="bg-white border-2 border-slate-200 rounded-lg px-4 py-2 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 outline-none transition-all cursor-pointer">
+                <select id="filtroSetor" onchange="carregarDadosReais()" class="bg-[#FDFBF7] border-2 border-[#D4B895] text-[#5C4033] rounded-lg px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-[#8B6B53] outline-none transition-all cursor-pointer">
                     <option value="">Todos os Setores (Geral)</option>
                     <option value="Financeiro">Financeiro</option>
                     <option value="Produção">Produção</option>
@@ -72,17 +82,17 @@
                     <option value="Administrativo">Administrativo</option>
                     <option value="Vendas">Vendas</option>
                 </select>
-                <button onclick="carregarDadosReais()" class="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                <button onclick="carregarDadosReais()" class="bg-[#8B6B53] hover:bg-[#7A5A44] text-[#FDFBF7] px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 tracking-wide">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    Sincronizar Dados
+                    Sincronizar
                 </button>
             </div>
-            <div id="loader" class="hidden flex items-center gap-2 text-emerald-600 font-bold animate-pulse">
+            <div id="loader" class="hidden flex items-center gap-2 text-[#8B6B53] font-bold animate-pulse">
                 <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span>Processando...</span>
+                <span class="text-sm tracking-wider">A processar...</span>
             </div>
         </header>
 
@@ -90,41 +100,41 @@
 
             <section id="tab-dashboard" class="tab-content tab-active">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-indigo-500">
-                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Gravidade Média</p>
-                        <h3 id="card-gravidade-media" class="text-4xl font-black text-slate-800 mono">--</h3>
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-[#8B6B53]">
+                        <p class="text-[#9D7E67] text-[10px] font-bold uppercase tracking-widest mb-1">Gravidade Média</p>
+                        <h3 id="card-gravidade-media" class="text-4xl font-black text-[#5C4033]">--</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-red-500">
-                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Alertas Críticos</p>
-                        <h3 id="card-critico" class="text-4xl font-black text-red-600 mono">--</h3>
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-[#c14953]">
+                        <p class="text-[#9D7E67] text-[10px] font-bold uppercase tracking-widest mb-1">Alertas Críticos</p>
+                        <h3 id="card-critico" class="text-4xl font-black text-[#c14953]">--</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-orange-500">
-                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Alertas Altos</p>
-                        <h3 id="card-alto" class="text-4xl font-black text-orange-600 mono">--</h3>
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-[#e2725b]">
+                        <p class="text-[#9D7E67] text-[10px] font-bold uppercase tracking-widest mb-1">Alertas Altos</p>
+                        <h3 id="card-alto" class="text-4xl font-black text-[#e2725b]">--</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-emerald-500">
-                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Setor</p>
-                        <h3 id="card-setor" class="text-2xl font-black text-emerald-600 truncate">Geral</h3>
+                    <div class="bg-white p-6 rounded-xl card-glow border-l-4 border-[#D4B895]">
+                        <p class="text-[#9D7E67] text-[10px] font-bold uppercase tracking-widest mb-1">Setor Analisado</p>
+                        <h3 id="card-setor" class="text-2xl font-black text-[#8B6B53] truncate mt-2">Geral</h3>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <div class="bg-white p-8 rounded-xl card-glow h-[420px]">
-                        <h4 class="font-bold text-slate-700 text-sm uppercase mb-6 tracking-wider">Matriz de Risco Geral</h4>
+                        <h4 class="font-bold text-[#5C4033] text-sm uppercase mb-6 tracking-wider">Matriz de Risco Geral</h4>
                         <div class="h-[300px] flex items-center justify-center">
                             <canvas id="chartDoughnut"></canvas>
                         </div>
                     </div>
                     <div class="bg-white p-8 rounded-xl card-glow h-[420px]">
-                        <h4 class="font-bold text-slate-700 text-sm uppercase mb-6 tracking-wider">Perfil de Gravidade por Tópico</h4>
+                        <h4 class="font-bold text-[#5C4033] text-sm uppercase mb-6 tracking-wider">Perfil de Gravidade por Tópico</h4>
                         <canvas id="chartRadar"></canvas>
                     </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl card-glow">
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="font-bold text-slate-700 text-sm uppercase tracking-wider">Ranking Geral de Intervenção</h4>
-                        <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold uppercase">Ranking de Risco</span>
+                        <h4 class="font-bold text-[#5C4033] text-sm uppercase tracking-wider">Ranking Geral de Intervenção</h4>
+                        <span class="px-3 py-1 bg-[#F5F0EA] text-[#8B6B53] rounded-full text-[10px] font-bold uppercase">Prioridade</span>
                     </div>
                     <div style="height: 260px; position: relative;">
                         <canvas id="chartBar"></canvas>
@@ -133,13 +143,13 @@
             </section>
 
             <section id="tab-analise" class="tab-content">
-                <div class="bg-white rounded-xl card-glow overflow-hidden">
-                    <div class="bg-slate-800 p-6">
-                        <h3 class="font-bold text-white text-lg uppercase tracking-tight">Relatório Quantitativo Detalhado</h3>
+                <div class="bg-white rounded-xl card-glow overflow-hidden border border-[#E6DCD3]">
+                    <div class="bg-[#5C4033] p-6">
+                        <h3 class="font-bold text-[#FDFBF7] text-lg uppercase tracking-widest">Relatório Quantitativo Detalhado</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-black">
+                            <thead class="bg-[#FDFBF7] text-[#8B6B53] uppercase text-[10px] font-black border-b border-[#E6DCD3]">
                                 <tr>
                                     <th class="px-6 py-4">Fator de Risco</th>
                                     <th class="px-6 py-4 text-center">Gravidade</th>
@@ -148,7 +158,7 @@
                                     <th class="px-6 py-4">Observações</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabela-analise" class="divide-y divide-slate-100">
+                            <tbody id="tabela-analise" class="divide-y divide-[#F5F0EA]">
                                 </tbody>
                         </table>
                     </div>
@@ -156,19 +166,19 @@
             </section>
 
             <section id="tab-medidas" class="tab-content">
-                <div class="bg-white p-8 rounded-xl card-glow mb-6">
+                <div class="bg-white p-8 rounded-xl card-glow mb-6 border border-[#E6DCD3]">
                     <div class="flex items-center justify-between mb-8">
                         <div>
-                            <h3 class="font-bold text-slate-800 text-xl uppercase">Cronograma de Controlo Psicossocial</h3>
-                            <p class="text-slate-400 text-xs mt-1">Plano estratégico de implementação anual</p>
+                            <h3 class="font-bold text-[#5C4033] text-xl uppercase tracking-wider">Cronograma de Intervenção</h3>
+                            <p class="text-[#9D7E67] text-xs mt-1 font-medium">Plano estratégico de ação preventiva</p>
                         </div>
-                        <button onclick="gerarPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2">
+                        <button onclick="gerarPDF()" class="bg-[#8B6B53] hover:bg-[#7A5A44] text-[#FDFBF7] px-5 py-2.5 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm tracking-wide">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"></path></svg>
                             Exportar Relatório PDF
                         </button>
                     </div>
                     
-                    <div class="grid grid-cols-12 gap-2 text-center text-[10px] font-black text-slate-400 mb-4 border-b pb-2 uppercase">
+                    <div class="grid grid-cols-12 gap-2 text-center text-[10px] font-black text-[#9D7E67] mb-4 border-b border-[#E6DCD3] pb-3 uppercase tracking-widest">
                         <div class="col-span-3 text-left">Ação Sugerida</div>
                         <div>Mês 1</div><div>Mês 2</div><div>Mês 3</div><div>Mês 4</div><div>Mês 5</div><div>Mês 6</div><div>Mês 7</div><div>Mês 8</div><div>Mês 9</div>
                     </div>
@@ -182,7 +192,9 @@
     </main>
 
     <script>
-       // rul
+        // ==========================================
+        // CONFIGURAÇÃO DA LIGAÇÃO COM O GOOGLE SHEETS
+        // ==========================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbw_8tT2Ggm_vqahwaNlM-Z11lEDwEVJsNUJRQUTZ_KQxTz5iu75jD4eMaDEncue2SJL/exec'; // <--- INSIRA AQUI O SEU LINK
 
         let charts = {};
@@ -247,10 +259,13 @@
             document.getElementById('card-alto').innerText = resumoRisco.alto;
             document.getElementById('card-setor').innerText = setorNome;
 
+            Chart.defaults.font.family = "'Montserrat', sans-serif";
+            Chart.defaults.color = "#7A5A44";
+
             // Renderizar Gráficos
             renderDoughnut(resumoRisco);
             renderRadar(topicos);
-            renderBar(topicos); // Agora exibe todos os tópicos
+            renderBar(topicos); 
             
             // Tabelas
             renderTabela(topicos);
@@ -266,11 +281,11 @@
                     labels: ['Baixo', 'Médio', 'Alto', 'Crítico'],
                     datasets: [{
                         data: [resumo.baixo, resumo.medio, resumo.alto, resumo.critico],
-                        backgroundColor: ['#22c55e', '#eab308', '#f97316', '#ef4444'],
+                        backgroundColor: ['#6b9e78', '#d4a373', '#e2725b', '#c14953'],
                         borderWidth: 0
                     }]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } }
             });
         }
 
@@ -284,22 +299,31 @@
                     datasets: [{
                         label: 'Gravidade',
                         data: topicos.map(t => t.gravidade),
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(139, 107, 83, 0.15)', /* Fundo Marrom Claro Transparente */
+                        borderColor: '#8B6B53',
                         borderWidth: 2,
+                        pointBackgroundColor: '#5C4033',
                         pointRadius: 3
                     }]
                 },
-                options: { scales: { r: { beginAtZero: true, max: 3 } }, plugins: { legend: { display: false } } }
+                options: { 
+                    scales: { 
+                        r: { 
+                            beginAtZero: true, 
+                            max: 3,
+                            grid: { color: 'rgba(139, 107, 83, 0.1)' },
+                            angleLines: { color: 'rgba(139, 107, 83, 0.1)' }
+                        } 
+                    }, 
+                    plugins: { legend: { display: false } } 
+                }
             });
         }
 
-        // Gráfico do Ranking Geral de todos os tópicos
         function renderBar(topicos) {
             const ctx = document.getElementById('chartBar');
             if (charts.bar) charts.bar.destroy();
             
-            // Ordenação completa de todos os tópicos, sem o slice de 5
             const topicosOrdenados = topicos.map(t => ({ ...t, risco: t.gravidade * t.probabilidade }))
                                .sort((a,b) => b.risco - a.risco);
 
@@ -311,7 +335,7 @@
                         data: topicosOrdenados.map(t => t.risco),
                         backgroundColor: topicosOrdenados.map(t => {
                             const n = calcularRiscoFinal(t.gravidade, t.probabilidade);
-                            return n === 'Crítico' ? '#ef4444' : n === 'Alto' ? '#f97316' : n === 'Médio' ? '#eab308' : '#22c55e';
+                            return n === 'Crítico' ? '#c14953' : n === 'Alto' ? '#e2725b' : n === 'Médio' ? '#d4a373' : '#6b9e78';
                         }),
                         barThickness: 14,
                         borderRadius: 4
@@ -323,7 +347,7 @@
                     plugins: { legend: { display: false } },
                     scales: { 
                         x: { beginAtZero: true, max: 9, grid: { display: false } }, 
-                        y: { grid: { display: false }, ticks: { font: { size: 10 } } } 
+                        y: { grid: { display: false }, ticks: { font: { size: 10, weight: '500' } } } 
                     }
                 }
             });
@@ -333,12 +357,12 @@
             document.getElementById('tabela-analise').innerHTML = topicos.map(t => {
                 const nivel = calcularRiscoFinal(t.gravidade, t.probabilidade);
                 return `
-                <tr>
-                    <td class="px-6 py-4 font-bold text-slate-700">${t.nome}</td>
-                    <td class="px-6 py-4 text-center mono font-bold">${t.gravidade.toFixed(1)}</td>
-                    <td class="px-6 py-4 text-center mono font-bold">${t.probabilidade.toFixed(1)}</td>
-                    <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-[10px] font-black ${getBadge(nivel)}">${nivel}</span></td>
-                    <td class="px-6 py-4 text-xs text-slate-500 italic">Análise baseada na NR-01</td>
+                <tr class="hover:bg-[#FDFBF7] transition-colors">
+                    <td class="px-6 py-4 font-bold text-[#5C4033]">${t.nome}</td>
+                    <td class="px-6 py-4 text-center font-bold text-lg text-[#8B6B53]">${t.gravidade.toFixed(1)}</td>
+                    <td class="px-6 py-4 text-center font-bold text-lg text-[#8B6B53]">${t.probabilidade.toFixed(1)}</td>
+                    <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getBadge(nivel)}">${nivel}</span></td>
+                    <td class="px-6 py-4 text-xs text-[#9D7E67] italic font-medium">Análise baseada na NR-01</td>
                 </tr>`;
             }).join('');
         }
@@ -347,12 +371,12 @@
             const acoes = topicos.filter(t => (t.gravidade * t.probabilidade) > 2.2);
             document.getElementById('lista-medidas').innerHTML = acoes.map(t => {
                 const risco = calcularRiscoFinal(t.gravidade, t.probabilidade);
-                const cor = risco === 'Crítico' ? 'bg-red-400' : 'bg-orange-400';
+                const cor = risco === 'Crítico' ? 'bg-[#c14953]' : 'bg-[#e2725b]';
                 return `
-                <div class="grid grid-cols-12 gap-2 items-center">
-                    <div class="col-span-3 text-[10px] font-bold text-slate-600 truncate">${t.nome.replace('Tópico', 'Ação')}</div>
-                    ${Array(6).fill(`<div class="h-3 ${cor} rounded shadow-sm"></div>`).join('')}
-                    ${Array(3).fill('<div class="h-3 bg-slate-100 rounded"></div>').join('')}
+                <div class="grid grid-cols-12 gap-2 items-center hover:bg-[#FDFBF7] p-1 rounded transition-colors">
+                    <div class="col-span-3 text-[10px] font-bold text-[#5C4033] truncate pr-2">${t.nome.replace('Tópico', 'Ação')}</div>
+                    ${Array(6).fill(`<div class="h-3 ${cor} rounded shadow-sm opacity-90"></div>`).join('')}
+                    ${Array(3).fill('<div class="h-3 bg-[#E6DCD3] rounded"></div>').join('')}
                 </div>`;
             }).join('');
         }
@@ -361,7 +385,7 @@
         function gerarPDF() {
             const btn = event.target;
             const original = btn.innerText;
-            btn.innerText = "A Gerar...";
+            btn.innerHTML = "A Gerar PDF...";
             
             const element = document.getElementById('area-impressao');
             const opt = {
@@ -372,7 +396,7 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => { btn.innerText = original; });
+            html2pdf().set(opt).from(element).save().then(() => { btn.innerHTML = original; });
         }
 
         window.onload = carregarDadosReais;
