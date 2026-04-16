@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
         .mono { font-family: 'Space Mono', monospace; }
         .nav-active { 
-            border-left: 4px solid #10b981; 
+            border-left: 4px solid #b2cf2f; 
             background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
             color: #10b981;
         }
@@ -123,10 +123,10 @@
 
                 <div class="bg-white p-6 rounded-xl card-glow">
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="font-bold text-slate-700 text-sm uppercase tracking-wider">Top 5 Prioridades de Intervenção</h4>
+                        <h4 class="font-bold text-slate-700 text-sm uppercase tracking-wider">Ranking Geral de Intervenção</h4>
                         <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold uppercase">Ranking de Risco</span>
                     </div>
-                    <div style="height: 220px; position: relative;">
+                    <div style="height: 260px; position: relative;">
                         <canvas id="chartBar"></canvas>
                     </div>
                 </div>
@@ -182,8 +182,8 @@
     </main>
 
     <script>
-        // CONFIGURAÇÃO DA API
-        const API_URL = 'https://script.google.com/macros/s/AKfycbw_8tT2Ggm_vqahwaNlM-Z11lEDwEVJsNUJRQUTZ_KQxTz5iu75jD4eMaDEncue2SJL/exec';
+       // rul
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw_8tT2Ggm_vqahwaNlM-Z11lEDwEVJsNUJRQUTZ_KQxTz5iu75jD4eMaDEncue2SJL/exec'; // <--- INSIRA AQUI O SEU LINK
 
         let charts = {};
         let dadosAtuais = { topicos: [] };
@@ -228,7 +228,7 @@
                 atualizarInterface(data.resumoRisco, data.setor);
                 
             } catch (e) {
-                console.error("Erro na ligação à planilha", e);
+                console.error("Erro na ligação à folha de cálculo", e);
             } finally {
                 document.getElementById('loader').classList.add('hidden');
             }
@@ -236,6 +236,7 @@
 
         function atualizarInterface(resumoRisco, setorNome) {
             const topicos = dadosAtuais.topicos;
+            if (!topicos || topicos.length === 0) return;
             
             // Atualizar Cards
             const gravidades = topicos.map(t => t.gravidade);
@@ -249,7 +250,7 @@
             // Renderizar Gráficos
             renderDoughnut(resumoRisco);
             renderRadar(topicos);
-            renderBar(topicos);
+            renderBar(topicos); // Agora exibe todos os tópicos
             
             // Tabelas
             renderTabela(topicos);
@@ -293,22 +294,24 @@
             });
         }
 
+        // Gráfico do Ranking Geral de todos os tópicos
         function renderBar(topicos) {
             const ctx = document.getElementById('chartBar');
             if (charts.bar) charts.bar.destroy();
             
-            const top5 = topicos.map(t => ({ ...t, risco: t.gravidade * t.probabilidade }))
-                               .sort((a,b) => b.risco - a.risco).slice(0,5);
+            // Ordenação completa de todos os tópicos, sem o slice de 5
+            const topicosOrdenados = topicos.map(t => ({ ...t, risco: t.gravidade * t.probabilidade }))
+                               .sort((a,b) => b.risco - a.risco);
 
             charts.bar = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: top5.map(t => t.nome.substring(0, 25)),
+                    labels: topicosOrdenados.map(t => t.nome.substring(0, 25) + '...'),
                     datasets: [{
-                        data: top5.map(t => t.risco),
-                        backgroundColor: top5.map(t => {
+                        data: topicosOrdenados.map(t => t.risco),
+                        backgroundColor: topicosOrdenados.map(t => {
                             const n = calcularRiscoFinal(t.gravidade, t.probabilidade);
-                            return n === 'Crítico' ? '#ef4444' : n === 'Alto' ? '#f97316' : '#eab308';
+                            return n === 'Crítico' ? '#ef4444' : n === 'Alto' ? '#f97316' : n === 'Médio' ? '#eab308' : '#22c55e';
                         }),
                         barThickness: 14,
                         borderRadius: 4
@@ -318,7 +321,10 @@
                     indexAxis: 'y',
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { x: { beginAtZero: true, max: 9, grid: { display: false } }, y: { grid: { display: false } } }
+                    scales: { 
+                        x: { beginAtZero: true, max: 9, grid: { display: false } }, 
+                        y: { grid: { display: false }, ticks: { font: { size: 10 } } } 
+                    }
                 }
             });
         }
@@ -351,7 +357,7 @@
             }).join('');
         }
 
-        // FUNÇÃO DE PDF
+        // FUNÇÃO DE EXPORTAÇÃO PARA PDF
         function gerarPDF() {
             const btn = event.target;
             const original = btn.innerText;
